@@ -50,4 +50,9 @@ class match
     {
         return $this->_date;
     }
+
+    public function getResult()
+    {
+        return $this->_result;
+    }
 }
