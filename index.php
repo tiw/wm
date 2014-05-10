@@ -4,7 +4,7 @@ require_once __DIR__ . '/silex/vendor/autoload.php';
 require_once __DIR__ . '/match_mapper.php';
 
 $app = new Silex\Application;
-$app['debug'] = true;
+//$app['debug'] = true;
 $app['dbConfig'] = [
     'host'=>'localhost', 'user'=>'root', 'password'=>'', 'database' => 'wm'
 ];
@@ -16,6 +16,13 @@ $app['mm'] = $app->share(function($app) {
 //$app['mm'] = function($app) {
     //return new MatchMapper($app['dbConfig']);
 //};
+
+// 
+$app->register(new Silex\Provider\MonologServiceProvider(), [
+    'monolog.logfile' => __DIR__ . '/dev.log',
+    'monolog.level' => 'DEBUG',
+]);
+$app['monolog']->addDebug('testing monolog');
 
 $app->get('/matches/{date}', function($date) use($app){
     $matches = $app['mm']->getByDate('2014/' . str_replace('-', '/', $app->escape($date)));
