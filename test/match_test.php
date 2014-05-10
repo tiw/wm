@@ -1,6 +1,6 @@
 <?php
 
-require '../match.php';
+require __DIR__.'/../match.php';
 
 class MatchTest extends PHPUnit_Framework_TestCase
 {

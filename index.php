@@ -14,4 +14,13 @@ $app->get('/matches/{date}', function($date) use($app){
     return json_encode($re);
 });
 
+$app->get('/matches/country/{country}', function($country) use($app){
+    $matches = MatchMapper::getMatchOfCountry($country);
+    $re = [];
+    array_walk($matches, function($m) use(&$re) {
+        $re[] = $m->getHostTeam() . '-' . $m->getGuestTeam() . ' at ' . $m->getDate() . ' ' . $m->getTime();
+    });
+    return json_encode($re);
+});
+
 $app->run();

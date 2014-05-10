@@ -45,4 +45,9 @@ class match
         );
         return $dateTime->sub($interval)->format('G:i');
     }
+
+    public function getDate()
+    {
+        return $this->_date;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-require '../match_mapper.php';
+require __DIR__.'/../match_mapper.php';
 
 class MatchMapperTest extends PHPUnit_Framework_TestCase
 {
@@ -12,5 +12,11 @@ class MatchMapperTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('克罗地亚', $matches[0]->getGuestTeam());
         $this->assertEquals('4:00', $matches[0]->getTime());
         $this->assertEquals('22:00', $matches[0]->getGermanTime());
+    }
+
+    public function testGetMatchOfCountry()
+    {
+        $matches = MatchMapper::getMatchOfCountry('德国');
+        $this->assertEquals(3, count($matches));
     }
 }
