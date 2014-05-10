@@ -1,12 +1,21 @@
 <?php
 
-require __DIR__.'/../match_mapper.php';
+require_once __DIR__.'/../match_mapper.php';
 
 class MatchMapperTest extends PHPUnit_Framework_TestCase
 {
+    private $mm;
+
+    public function setUp()
+    {
+        $this->mm = new MatchMapper(
+            ['host'=>'localhost', 'user'=>'root', 'password'=>'', 'database' => 'wm']
+        );
+    }
+
     public function testGetByDate()
     {
-        $matches = MatchMapper::getByDate('2014/6/13');
+        $matches = $this->mm->getByDate('2014/6/13');
         $this->assertEquals(1, count($matches));
         $this->assertEquals('巴西', $matches[0]->getHostTeam());
         $this->assertEquals('克罗地亚', $matches[0]->getGuestTeam());
@@ -16,24 +25,24 @@ class MatchMapperTest extends PHPUnit_Framework_TestCase
 
     public function testGetMatchOfCountry()
     {
-        $matches = MatchMapper::getMatchOfCountry('德国');
+        $matches = $this->mm->getMatchOfCountry('德国');
         $this->assertEquals(3, count($matches));
     }
 
     public function testGetById()
     {
-        $match = MatchMapper::getById(1);
+        $match = $this->mm->getById(1);
         $this->assertEquals('巴西', $match->getHostTeam());
     }
 
     public function testUpdateMatch()
     {
         $id = 1;
-        MatchMapper::updateMatch($id, '1:2');
-        $match = MatchMapper::getById($id);
+        $this->mm->updateMatch($id, '1:2');
+        $match = $this->mm->getById($id);
         $this->assertEquals('1:2', $match->getResult());
-        MatchMapper::updateMatch($id, '');
-        $match = MatchMapper::getById($id);
+        $this->mm->updateMatch($id, '');
+        $match = $this->mm->getById($id);
         $this->assertEquals('', $match->getResult());
 
     }
@@ -41,7 +50,7 @@ class MatchMapperTest extends PHPUnit_Framework_TestCase
     public function testGetGroupMatches()
     {
         $group = 'A';
-        $matches = MatchMapper::getGroupMatches($group);
+        $matches = $this->mm->getGroupMatches($group);
         $this->assertEquals(6, count($matches));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../text_parser.php';
+require_once __DIR__.'/../text_parser.php';
 
 class TextParserTest extends PHPUnit_Framework_TestCase
 {
