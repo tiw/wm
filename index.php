@@ -4,7 +4,7 @@ require_once __DIR__ . '/silex/vendor/autoload.php';
 require_once __DIR__ . '/match_mapper.php';
 
 $app = new Silex\Application;
-//$app['debug'] = true;
+$app['debug'] = true;
 $app['dbConfig'] = [
     'host'=>'localhost', 'user'=>'root', 'password'=>'', 'database' => 'wm'
 ];
@@ -23,6 +23,16 @@ $app->register(new Silex\Provider\MonologServiceProvider(), [
     'monolog.level' => 'DEBUG',
 ]);
 $app['monolog']->addDebug('testing monolog');
+
+$app->register(new Silex\Provider\DoctrineServiceProvider(), [
+    'db.options'=>[
+        'driver'=>'pdo_mysql',
+        'dbhost' => 'localhost',
+        'dbname'=> 'wm',
+        'user' => 'root',
+        'password' => ''
+    ]
+]);
 
 $app->get('/matches/{date}', function($date) use($app){
     $matches = $app['mm']->getByDate('2014/' . str_replace('-', '/', $app->escape($date)));
@@ -43,8 +53,10 @@ $app->get('/matches/country/{country}', function($country) use($app){
 });
 
 
-$app->put('/matches/{id}', function($id) {
-    
+$app->get('/matches/id/{id}', function($id) use($app) {
+    $sql  = "select * from matches where id = ?";
+    $match = $app['db']->fetchAssoc($sql, [(int) $id]);
+    return $app->json($match);
 });
 
 $app->run();
