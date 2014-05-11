@@ -5,12 +5,18 @@ require_once __DIR__ . '/match_mapper.php';
 
 $app = new Silex\Application;
 $app['debug'] = true;
-$app['dbConfig'] = [
-    'host'=>'localhost', 'user'=>'root', 'password'=>'', 'database' => 'wm'
-];
+$app->register(new Silex\Provider\DoctrineServiceProvider(), [
+    'db.options'=>[
+        'driver'=>'pdo_mysql',
+        'dbhost' => 'localhost',
+        'dbname'=> 'wm',
+        'user' => 'root',
+        'password' => ''
+    ]
+]);
 // like singleton
 $app['mm'] = $app->share(function($app) {
-    return new MatchMapper($app['dbConfig']);
+    return new MatchMapper($app['db']);
 });
 // everytime using $app['mm'] the contructor will be called, new object is created.
 //$app['mm'] = function($app) {
@@ -24,15 +30,6 @@ $app->register(new Silex\Provider\MonologServiceProvider(), [
 ]);
 $app['monolog']->addDebug('testing monolog');
 
-$app->register(new Silex\Provider\DoctrineServiceProvider(), [
-    'db.options'=>[
-        'driver'=>'pdo_mysql',
-        'dbhost' => 'localhost',
-        'dbname'=> 'wm',
-        'user' => 'root',
-        'password' => ''
-    ]
-]);
 
 $app->get('/matches/{date}', function($date) use($app){
     $matches = $app['mm']->getByDate('2014/' . str_replace('-', '/', $app->escape($date)));
