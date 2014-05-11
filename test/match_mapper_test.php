@@ -1,6 +1,8 @@
 <?php
 
 require_once __DIR__.'/../match_mapper.php';
+require_once __DIR__.'/../silex/vendor/autoload.php';
+use \Doctrine\DBAL\DriverManager;
 
 class MatchMapperTest extends PHPUnit_Framework_TestCase
 {
@@ -9,7 +11,13 @@ class MatchMapperTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->mm = new MatchMapper(
-            ['host'=>'localhost', 'user'=>'root', 'password'=>'', 'database' => 'wm']
+            DriverManager::getConnection([ 
+                'driver' => 'pdo_mysql',
+                'user' => 'root',
+                'password' => '',
+                'host' => 'localhost',
+                'dbname' => 'wm'
+            ]) 
         );
     }
 

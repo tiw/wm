@@ -3,33 +3,16 @@ require 'match.php';
 
 class MatchMapper
 {
-    public function __construct($dbConfig)
+    public function __construct($db)
     {
-        $this->link = mysql_connect(
-            $dbConfig['host'], $dbConfig['user'], $dbConfig['password']
-        );
-        mysql_select_db($dbConfig['database']);
+        $this->db = $db;
     }
 
-    public function tearDown()
+    private function dbQuery($query, $params)
     {
-        mysql_close($this->link);
-    }
-
-    private function buildResource($query)
-    {
-        $resources = mysql_query($query, $this->link);
-        if (!$resources) {
-            var_dump(mysql_error());
-        }
-        return $resources;
-    }
-
-    private function dbQuery($query)
-    {
-        $resources = $this->buildResource($query);
+        $rows = $this->db->fetchAll($query, $params);
         $matches = [];
-        while($row = mysql_fetch_assoc($resources)) {
+        foreach($rows as $row) {
             $matches[] = new Match(
                 $row['date'], $row['time'], $row['host'], $row['guest'],
                 $row['studio'], $row['result'], $row['match']
@@ -40,8 +23,8 @@ class MatchMapper
 
     public function getByDate($date)
     {
-        $sql = "select * from matches where date='$date'";
-        return $this->dbQuery($sql);
+        $sql = "select * from matches where date=?";
+        return $this->dbQuery($sql, [$date]);
     }
 
     public function getTodayMatch()
@@ -53,14 +36,14 @@ class MatchMapper
 
     public function getById($id)
     {
-        $sql = "select * from matches where id=$id";
-        return $this->dbQuery($sql)[0];
+        $sql = "select * from matches where id=?";
+        return $this->dbQuery($sql, [$id])[0];
     }
 
     public function getMatchOfCountry($country)
     {
-        $sql = "select * from matches where host='$country' or guest='$country'";
-        return $this->dbQuery($sql);
+        $sql = "select * from matches where host=? or guest=?";
+        return $this->dbQuery($sql, [$country, $country]);
     }
 
     public function getGroupMatches($group)
@@ -69,17 +52,14 @@ class MatchMapper
             throw new Exception("invalid group $group");
         }
         $groupName = $group . '%';
-        $sql = "select * from matches where `match` like '$groupName'";
-        return $this->dbQuery($sql);
+        $sql = "select * from matches where `match` like ?";
+        return $this->dbQuery($sql, [$groupName]);
     }
 
     public function updateMatch($id, $result)
     {
-        $sql = "update matches set result = '$result' where id=$id";
-        $isSuccessfully = $this->buildResource($sql);
-        if(!$isSuccessfully) {
-            var_dump(mysql_error());
-        }
+        $sql = "update matches set result = ? where id = ?";
+        $isSuccessfully = $this->db->executeUpdate($sql, [$result, $id]);
         return $isSuccessfully;
     }
 }
